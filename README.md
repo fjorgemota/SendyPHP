@@ -17,27 +17,14 @@ Next, update Composer from the Terminal:
 
     composer update
 
-### Old School (alternative option)
-
-* Place SendyPHP.php into your file structure
-* Include or require SendyPHP in the location you would like to utilize it
-
-```php
-	require('SendyPHP.php');
-```
-
 #Usage
 
 Create an instance of the class while passing in an array including your API key, installation URL, and the List ID you wish to work with.
 ```php
 
-	$config = array(
-		'api_key' => 'yourapiKEYHERE', //your API key is available in Settings
-		'installation_url' => 'http://updates.mydomain.com',  //Your Sendy installation
-		'list_id' => 'your_list_id_goes_here'
-	);
+	use \SendyPHP\SendyPHP;
 	
-	$sendy = new SendyPHP($config);
+	$sendy = new SendyPHP('http://updates.mydomain.com', 'yourapiKEYHERE'm 'your_list_id_goes_here');
 	
 	//you can change the list_id you are referring to at any point
 	$sendy->setListId("a_different_list_id");
@@ -47,65 +34,55 @@ Create an instance of the class while passing in an array including your API key
 After creating a new instance of SendyPHP call any of the methods below 
 
 ##Return Values
-The return value of any of these functions will include both a status, and a message to go with that status.
+The return value of any of the functions which interact directly with Sendy will always be an instance of `SendyResponse`, which have two public methods:
 
-The status is a boolean value of `true` or `false` and the message will vary based on the type of action being performed.
+ - isSuccessful() - Indicating if the request will be successful
+ - getResult() - Return the raw response informed by Sendy
 
-```php
-	//example of a succesful return value
-	array(
-		'status'=>true,
-		'message'=>'Already Subscribed'
-	)
-	
-	//example of a UNsuccesful return value
-	array(
-		'status'=>false,
-		'message'=>'Some fields are missing.'
-	)
-```
-
-I have commented and organized the code so as to be readable, if you have further questions on the status or messages being returned, please refer to the library comments.
+This library have PHPDoc comments, which make the code easy to understand at all.
 
 ##subscribe(array $values)
 
 This method takes an array of `$values` and will attempt to add the `$values` into the list specified in `$list_id`
 
 ```php
-	$results = $sendy->subscribe(array(
+	$result = $sendy->subscribe(array(
 						'name'=>'Jim',
 						'email' => 'Jim@gmail.com', //this is the only field required by sendy
 						'customfield1' => 'customValue'
 						));
 ```
 __Note:__ Be sure to add any custom fields to the list in Sendy before utilizing them inside this library.
-__Another Note:__ If a user is already subscribed to the list, the library will return a status of `true`. Feel free to edit the code to meet your needs.
+__Another Note:__ If a user is already subscribed to the list, the library will return a SendyResponse which return 'Already Subscribed' on his call to getResult().
 
 ##unsubscribe($email)
 
 Unsubscribes the provided e-mail address (if it exists) from the current list.
+
 ```php
-	$results = $sendy->unsubscribe('test@testing.com');
+	$result = $sendy->unsubscribe('test@testing.com');
 ```
 
-##substatus($email)
+##getStatus($email)
 
 Returns the status of the user with the provided e-mail address (if it exists) in the current list.
 ```php
-	$results = $sendy->substatus('test@testing.com');
+	$results = $sendy->getStatus('test@testing.com');
 ```
 __Note:__ refer to the code or see http://sendy.co/api for the types of return messages you can expect.
 
-##subcount()
+##getSubscribersCount()
 
 Returns the number of subscribers to the current list.
 ```php
-	$results = $sendy->subcount();
+	$result = $sendy->getSubscribersCount();
+	echo $result->getResult(); // The number of subscribers in the list
 ```
 
 ##setListId($list_id) and getListId()
 
 Change or get the list you are currently working with.
+
 ```php
 	
 	//set or switch the list id
