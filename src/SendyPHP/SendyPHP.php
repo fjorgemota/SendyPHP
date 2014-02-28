@@ -94,20 +94,9 @@ class SendyPHP
 
         //Send the subscribe
         $result = $this->sendRequest('subscribe', $values);
-
+        $successResults = array('true', '1', 'Already subscribed.');
         //Handle results
-        switch ($result) {
-            case 'true':
-            case '1':
-                return new SendyResponse(true, $result);
-                break;
-            case 'Already subscribed.':
-                return new SendyResponse(true, $result);
-                break;
-            default:
-                return new SendyResponse(false, $result);
-                break;
-        }
+        return new SendyResponse(in_array($result, $successResults), $result);
     }
 
     /**
@@ -118,16 +107,12 @@ class SendyPHP
      */
     public function unsubscribe($email)
     {
-        //Send the unsubscribe request
         $parameters = array(
             'email' => $email
         );
         $result = $this->sendRequest('unsubscribe', $parameters);
-        //Handle results
-        if ($result == '1' || $result == 'true') {
-            return new SendyResponse(true, $result);
-        }
-        return new SendyResponse(false, $result);
+        $successResults = array('1', 'true');
+        return new SendyResponse(in_array($result, $successResults), $result);
     }
 
     /**
@@ -143,22 +128,9 @@ class SendyPHP
             'api_key' => $this->api_key,
             'list_id' => $this->list_id
         );
-        //Send the request for status
         $result = $this->sendRequest('api/subscribers/subscription-status.php', $parameters);
-        //Handle the results
-        switch ($result) {
-            case 'Subscribed':
-            case 'Unsubscribed':
-            case 'Unconfirmed':
-            case 'Bounced':
-            case 'Soft bounced':
-            case 'Complained':
-                return new SendyResponse(true, $result);
-                break;
-            default:
-                return new SendyResponse(false, $result);
-                break;
-        }
+        $successResults = array('Subscribed', 'Unsubscribed', 'Unconfirmed', 'Bounced', 'Soft bounced', 'Complained');
+        return new SendyResponse(in_array($result, $successResults), $result);
     }
 
     /**
@@ -168,14 +140,11 @@ class SendyPHP
      */
     public function getSubscribersCount()
     {
-        //Send request for subcount
         $parameters = array(
             'api_key' => $this->api_key,
             'list_id' => $this->list_id
         );
         $result = $this->sendRequest('api/subscribers/active-subscriber-count.php', $parameters);
-
-        //Handle the results
         return new SendyResponse(is_numeric($result), $result);
     }
 
@@ -189,15 +158,11 @@ class SendyPHP
      */
     protected function sendRequest($type, array $values)
     {
-        //Global options for return
         $return_options = array(
             'list' => $this->list_id,
             'boolean' => 'true'
         );
-
-        //Merge the passed in values with the options for return
         $content = array_merge($values, $return_options);
-
         return $this->client->post($type, [], $content)->send()->getBody(true);
     }
 }
