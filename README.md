@@ -1,4 +1,4 @@
-SendyPHP
+SendyPHP [![Build Status](https://travis-ci.org/fjorgemota/SendyPHP.png?branch=master)](https://travis-ci.org/fjorgemota/SendyPHP)
 =================
 
 A PHP class built to interface with the Sendy API ([http://sendy.co](http://sendy.co))
