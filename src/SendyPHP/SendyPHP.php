@@ -49,13 +49,11 @@ class SendyPHP
         }
         if ($installation_url_or_client instanceof Client) {
             $this->client = $installation_url_or_client;
-        }
-        else {
-            $this->client = new Client($installation_url);
+        } else {
+            $this->client = new Client($installation_url_or_client);
         }
         $this->api_key = $api_key;
         $this->list_id = $list_id;
-
     }
 
     /**
